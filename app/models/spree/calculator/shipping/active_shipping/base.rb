@@ -41,6 +41,7 @@ module Spree
           end
           if rates_result.empty?
             puts "Rates Result empty"
+            puts "Rates Result: " + rates_result.to_s
             return nil 
           else
             puts "Rates Result: " + rates_result.to_s
