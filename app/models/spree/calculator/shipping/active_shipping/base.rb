@@ -23,6 +23,7 @@ module Spree
 
           !compute(package).nil?
         rescue Spree::ShippingError
+          puts "Shipping Error"
           false
         end
 
@@ -77,7 +78,6 @@ module Spree
 
         end
 
-        protected
         # weight limit in ounces or zero (if there is no limit)
         def max_weight_for_country(country)
           0
@@ -88,10 +88,12 @@ module Spree
         # that will limit you from shipping using a service
         def is_package_shippable? package
           # check for weight limits on service
+          puts "is_package_shippable?: " + country_weight_error?(package).to_s
           country_weight_error? package
         end
 
         def country_weight_error? package
+          puts "country_weight_error?"
           max_weight = max_weight_for_country(package.order.ship_address.country)
           raise Spree::ShippingError.new("#{I18n.t(:shipping_error)}: The maximum per package weight for the selected service from the selected country is #{max_weight} ounces.") unless valid_weight_for_package?(package, max_weight)
         end
@@ -99,6 +101,7 @@ module Spree
         # zero weight check means no check
         # nil check means service isn't available for that country
         def valid_weight_for_package? package, max_weight
+          puts "valid_weight_for_pacakge?"
           return false if max_weight.nil?
           return true if max_weight.zero?
           package.weight <= max_weight
@@ -116,6 +119,7 @@ module Spree
             return rate_hash
           rescue ::ActiveShipping::Error => e
 
+            puts "Shipping error in retrieve_rates"
             if e.class == ::ActiveShipping::ResponseError && e.response.is_a?(::ActiveShipping::Response)
               params = e.response.params
               if params.has_key?("Response") && params["Response"].has_key?("Error") && params["Response"]["Error"].has_key?("ErrorDescription")
@@ -145,6 +149,7 @@ module Spree
               return response
             end
           rescue ::ActiveShipping::ResponseError => re
+            puts "Shipping error in retrieve_timings"
             if re.response.is_a?(::ActiveShipping::Response)
               params = re.response.params
               if params.has_key?("Response") && params["Response"].has_key?("Error") && params["Response"]["Error"].has_key?("ErrorDescription")
@@ -175,6 +180,7 @@ module Spree
             if max_weight <= 0 || item_weight < max_weight
               item_weight
             else
+              puts "Shipping error in convert_package_to_weights_array"
               raise Spree::ShippingError.new("#{I18n.t(:shipping_error)}: The maximum per package weight for the selected service from the selected country is #{max_weight} ounces.")  
             end
           end
@@ -197,6 +203,7 @@ module Spree
                   packages << [product_package.weight * multiplier, product_package.length, product_package.width, product_package.height]
                 end
               else
+                puts "Shipping error in convert_package_to_items_packages_array"
                 raise Spree::ShippingError.new("#{I18n.t(:shipping_error)}: The maximum per package weight for the selected service from the selected country is #{max_weight} ounces.")
               end
             end
