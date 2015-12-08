@@ -101,6 +101,8 @@ module Spree
         # nil check means service isn't available for that country
         def valid_weight_for_package? package, max_weight
           puts "valid_weight_for_pacakge?"
+          puts "max_weight: " + max_weight.to_s
+          puts "package_weight: " + package.weight.to_s
           return false if max_weight.nil?
           return true if max_weight.zero?
           package.weight <= max_weight
