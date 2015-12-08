@@ -35,9 +35,18 @@ module Spree
 
           rates_result = retrieve_rates_from_cache(package, origin, destination)
 
-          return nil if rates_result.kind_of?(Spree::ShippingError)
-          return nil if rates_result.empty?
+          if rates_result.kind_of?(Spree::ShippingError)
+            puts "Spree shipping error"
+            return nil 
+          end
+          if rates_result.empty?
+            puts "Rates Result empty"
+            return nil 
+          else
+            puts "Rates Result: " + rates_result.to_s
+          end
           rate = rates_result[self.class.description]
+          puts "self.class.description: " + self.class.description.to_s
 
           return nil unless rate
           rate = rate.to_f + (Spree::ActiveShipping::Config[:handling_fee].to_f || 0.0)
