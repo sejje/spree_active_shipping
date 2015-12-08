@@ -83,7 +83,6 @@ module Spree
           0
         end
 
-        private
         # check for known limitations inside a package
         # that will limit you from shipping using a service
         def is_package_shippable? package
